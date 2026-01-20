@@ -35,10 +35,6 @@ public class Fixture extends Auditable {
     @Column(name = "away_score")
     private Integer awayScore;
 
-    @NotNull
-    @Column(nullable = false)
-    private Boolean played = false;
-
     @Column(length = 100)
     private String stadium;
 
@@ -52,7 +48,7 @@ public class Fixture extends Auditable {
     protected Fixture() {
     }
 
-    public Fixture(Long leagueId, Integer week, LocalDateTime matchDate, Long homeTeamId, Long awayTeamId, Integer homeScore, Integer awayScore, Boolean played, String stadium, String season, FixtureStatus status) {
+    public Fixture(Long leagueId, Integer week, LocalDateTime matchDate, Long homeTeamId, Long awayTeamId, Integer homeScore, Integer awayScore, String stadium, String season, FixtureStatus status) {
         this.leagueId = leagueId;
         this.week = week;
         this.matchDate = matchDate;
@@ -60,7 +56,6 @@ public class Fixture extends Auditable {
         this.awayTeamId = awayTeamId;
         this.homeScore = homeScore;
         this.awayScore = awayScore;
-        this.played = played;
         this.stadium = stadium;
         this.season = season;
         this.status = status;
@@ -71,7 +66,6 @@ public class Fixture extends Auditable {
     }
 
     public static class Builder {
-
         private Long leagueId;
         private Integer week;
         private LocalDateTime matchDate;
@@ -79,7 +73,6 @@ public class Fixture extends Auditable {
         private Long awayTeamId;
         private Integer homeScore;
         private Integer awayScore;
-        private Boolean played;
         private String stadium;
         private String season;
         private FixtureStatus status;
@@ -122,11 +115,6 @@ public class Fixture extends Auditable {
             return this;
         }
 
-        public Builder played(Boolean played) {
-            this.played = played;
-            return this;
-        }
-
         public Builder stadium(String stadium) {
             this.stadium = stadium;
             return this;
@@ -143,10 +131,9 @@ public class Fixture extends Auditable {
         }
 
         public Fixture build() {
-            return new Fixture(leagueId, week, matchDate, homeTeamId, awayTeamId, homeScore, awayScore, played, stadium, season, status);
+            return new Fixture(leagueId, week, matchDate, homeTeamId, awayTeamId, homeScore, awayScore, stadium, season, status);
         }
     }
-
 
     public Long getLeagueId() {
         return leagueId;
@@ -202,14 +189,6 @@ public class Fixture extends Auditable {
 
     public void setAwayScore(Integer awayScore) {
         this.awayScore = awayScore;
-    }
-
-    public Boolean getPlayed() {
-        return played;
-    }
-
-    public void setPlayed(Boolean played) {
-        this.played = played;
     }
 
     public String getStadium() {
