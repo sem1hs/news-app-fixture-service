@@ -2,6 +2,7 @@ package com.semihsahinoglu.fixture_service.mapper;
 
 import com.semihsahinoglu.fixture_service.dto.CreateFixtureRequest;
 import com.semihsahinoglu.fixture_service.dto.FixtureResponse;
+import com.semihsahinoglu.fixture_service.dto.FixtureTodayResponse;
 import com.semihsahinoglu.fixture_service.dto.UpdateFixtureRequest;
 import com.semihsahinoglu.fixture_service.entity.Fixture;
 import com.semihsahinoglu.fixture_service.entity.FixtureStatus;
@@ -35,6 +36,24 @@ public class FixtureMapper {
                 .matchDate(fixture.getMatchDate())
                 .homeTeamId(fixture.getHomeTeamId())
                 .awayTeamId(fixture.getAwayTeamId())
+                .homeScore(fixture.getHomeScore())
+                .awayScore(fixture.getAwayScore())
+                .stadium(fixture.getStadium())
+                .season(fixture.getSeason())
+                .status(fixture.getStatus())
+                .build();
+    }
+
+    public FixtureTodayResponse toDto(Fixture fixture, String leagueName, String homeTeamName, String awayTeamName) {
+        if (fixture == null) return null;
+
+        return FixtureTodayResponse.builder()
+                .id(fixture.getId())
+                .leagueName(leagueName)
+                .week(fixture.getWeek())
+                .matchDate(fixture.getMatchDate())
+                .homeTeamName(homeTeamName)
+                .awayTeamName(awayTeamName)
                 .homeScore(fixture.getHomeScore())
                 .awayScore(fixture.getAwayScore())
                 .stadium(fixture.getStadium())

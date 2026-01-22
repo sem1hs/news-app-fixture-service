@@ -2,6 +2,7 @@ package com.semihsahinoglu.fixture_service.controller;
 
 import com.semihsahinoglu.fixture_service.dto.CreateFixtureRequest;
 import com.semihsahinoglu.fixture_service.dto.FixtureResponse;
+import com.semihsahinoglu.fixture_service.dto.FixtureTodayResponse;
 import com.semihsahinoglu.fixture_service.dto.UpdateFixtureRequest;
 import com.semihsahinoglu.fixture_service.service.FixtureService;
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/fixture")
@@ -36,6 +38,12 @@ public class FixtureController {
     @GetMapping(params = {"leagueId", "week"})
     public ResponseEntity<List<FixtureResponse>> getWeeklyFixtures(@RequestParam Long leagueId, @RequestParam Integer week) {
         List<FixtureResponse> response = fixtureService.getByLeagueAndWeek(leagueId, week);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<Map<String, List<FixtureTodayResponse>>> getTodayFixtures() {
+        Map<String, List<FixtureTodayResponse>> response = fixtureService.getTodayFixtures();
         return ResponseEntity.ok().body(response);
     }
 

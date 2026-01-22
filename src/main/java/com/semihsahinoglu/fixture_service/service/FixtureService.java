@@ -4,6 +4,7 @@ import com.semihsahinoglu.fixture_service.client.LeagueClient;
 import com.semihsahinoglu.fixture_service.client.TeamClient;
 import com.semihsahinoglu.fixture_service.dto.CreateFixtureRequest;
 import com.semihsahinoglu.fixture_service.dto.FixtureResponse;
+import com.semihsahinoglu.fixture_service.dto.FixtureTodayResponse;
 import com.semihsahinoglu.fixture_service.dto.UpdateFixtureRequest;
 import com.semihsahinoglu.fixture_service.entity.Fixture;
 import com.semihsahinoglu.fixture_service.exception.FixtureNotFoundException;
@@ -15,9 +16,15 @@ import com.semihsahinoglu.fixture_service.repository.FixtureRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 @Service
 public class FixtureService {
@@ -61,6 +68,35 @@ public class FixtureService {
 
         return fixtures.stream().map(fixtureMapper::toDto).toList();
     }
+
+    public Map<String, List<FixtureTodayResponse>> getTodayFixtures() {
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+        List<Fixture> fixtures = fixtureRepository.findTodayFixtures(startOfDay, endOfDay);
+
+        if (fixtures == null) throw new FixtureNotFoundException("Bugüne ait fikstür bulunamadı !");
+
+        Map<Long, String> leagueNameCache = new HashMap<>();
+        Map<Long, String> teamNameCache = new HashMap<>();
+
+        return fixtures.stream()
+                .map(fixture -> {
+                    String leagueName = leagueNameCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
+                    String homeTeamName = teamNameCache.computeIfAbsent(fixture.getHomeTeamId(), id -> teamClient.findTeamById(id).name());
+                    String awayTeamName = teamNameCache.computeIfAbsent(fixture.getAwayTeamId(), id -> teamClient.findTeamById(id).name());
+
+                    return fixtureMapper.toDto(fixture, leagueName, homeTeamName, awayTeamName);
+                })
+                .collect(Collectors.groupingBy(
+                        FixtureTodayResponse::leagueName,
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+    }
+
 
     public FixtureResponse create(CreateFixtureRequest request) {
         if (request.homeTeamId().equals(request.awayTeamId())) {
