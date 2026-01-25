@@ -36,8 +36,8 @@ public class FixtureController {
     }
 
     @GetMapping(params = {"leagueId", "week"})
-    public ResponseEntity<List<FixtureResponse>> getWeeklyFixtures(@RequestParam Long leagueId, @RequestParam Integer week) {
-        List<FixtureResponse> response = fixtureService.getByLeagueAndWeek(leagueId, week);
+    public ResponseEntity<List<FixtureTodayResponse>> getWeeklyFixtures(@RequestParam Long leagueId, @RequestParam Integer week) {
+        List<FixtureTodayResponse> response = fixtureService.getByLeagueAndWeek(leagueId, week);
         return ResponseEntity.ok().body(response);
     }
 
