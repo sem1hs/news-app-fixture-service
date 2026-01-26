@@ -1,8 +1,6 @@
 spring:
   application:
     name: fixture-service
-  profiles:
-    active: dev
 
   config:
-    import: optional:configserver:http://config:password123@localhost:8888
+    import: optional:configserver:http://config:password123@config-server:8888
