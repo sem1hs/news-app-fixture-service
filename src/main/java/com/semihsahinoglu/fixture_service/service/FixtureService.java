@@ -7,6 +7,7 @@ import com.semihsahinoglu.fixture_service.dto.FixtureResponse;
 import com.semihsahinoglu.fixture_service.dto.FixtureTodayResponse;
 import com.semihsahinoglu.fixture_service.dto.UpdateFixtureRequest;
 import com.semihsahinoglu.fixture_service.entity.Fixture;
+import com.semihsahinoglu.fixture_service.entity.FixtureStatus;
 import com.semihsahinoglu.fixture_service.exception.FixtureNotFoundException;
 import com.semihsahinoglu.fixture_service.exception.LeagueNotFoundException;
 import com.semihsahinoglu.fixture_service.exception.TeamAlreadyHaveMatchException;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class FixtureService {
 
+    private final FixtureInternalService fixtureInternalService;
     private final FixtureRepository fixtureRepository;
     private final LeagueClient leagueClient;
     private final TeamClient teamClient;
@@ -36,7 +38,8 @@ public class FixtureService {
     private final FixtureMapper fixtureMapper;
 
 
-    public FixtureService(FixtureRepository fixtureRepository, LeagueClient leagueClient, TeamClient teamClient, @Qualifier("apiExecutor") Executor apiExecutor, FixtureMapper fixtureMapper) {
+    public FixtureService(FixtureInternalService fixtureInternalService, FixtureRepository fixtureRepository, LeagueClient leagueClient, TeamClient teamClient, @Qualifier("apiExecutor") Executor apiExecutor, FixtureMapper fixtureMapper) {
+        this.fixtureInternalService = fixtureInternalService;
         this.fixtureRepository = fixtureRepository;
         this.leagueClient = leagueClient;
         this.teamClient = teamClient;
@@ -139,13 +142,20 @@ public class FixtureService {
         Fixture fixture = fixtureMapper.toEntity(request);
         Fixture savedFixture = fixtureRepository.save(fixture);
 
+        fixtureInternalService.handleFixtureCreate(savedFixture);
+
         return fixtureMapper.toDto(savedFixture);
     }
 
     public FixtureResponse update(Long fixtureId, UpdateFixtureRequest request) {
         Fixture fixture = fixtureRepository.findById(fixtureId).orElseThrow(() -> new FixtureNotFoundException("Fikstür bulunamadı !"));
+
+        FixtureStatus oldStatus = fixture.getStatus();
+
         fixtureMapper.updateEntity(fixture, request);
         Fixture updatedFixture = fixtureRepository.save(fixture);
+
+        fixtureInternalService.handleFixtureUpdate(updatedFixture, oldStatus);
 
         return fixtureMapper.toDto(updatedFixture);
     }
