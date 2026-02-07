@@ -2,10 +2,7 @@ package com.semihsahinoglu.fixture_service.service;
 
 import com.semihsahinoglu.fixture_service.client.LeagueClient;
 import com.semihsahinoglu.fixture_service.client.TeamClient;
-import com.semihsahinoglu.fixture_service.dto.CreateFixtureRequest;
-import com.semihsahinoglu.fixture_service.dto.FixtureResponse;
-import com.semihsahinoglu.fixture_service.dto.FixtureTodayResponse;
-import com.semihsahinoglu.fixture_service.dto.UpdateFixtureRequest;
+import com.semihsahinoglu.fixture_service.dto.*;
 import com.semihsahinoglu.fixture_service.entity.Fixture;
 import com.semihsahinoglu.fixture_service.entity.FixtureStatus;
 import com.semihsahinoglu.fixture_service.exception.FixtureNotFoundException;
@@ -52,14 +49,18 @@ public class FixtureService {
         return fixtureMapper.toDto(fixture);
     }
 
-    public List<FixtureResponse> getAllByLeagueId(Long leagueId) {
+    public List<FixtureWeekResponse> getAllByLeagueId(Long leagueId) {
         boolean leagueExist = leagueClient.existsById(leagueId);
 
         if (!leagueExist) throw new LeagueNotFoundException("Lig bulunamadı !");
 
         List<Fixture> fixtures = fixtureRepository.findByLeagueIdOrderByMatchDateAsc(leagueId).orElseThrow(() -> new FixtureNotFoundException("Fikstür bulunamadı !"));
+        Map<Integer, List<FixtureResponse>> groupedByWeek = fixtures.stream().map(fixtureMapper::toDto).collect(Collectors.groupingBy(FixtureResponse::week));
 
-        return fixtures.stream().map(fixtureMapper::toDto).toList();
+        return groupedByWeek.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> new FixtureWeekResponse(entry.getKey(), entry.getValue()))
+                .toList();
     }
 
     public List<FixtureTodayResponse> getByLeagueAndWeek(Long leagueId, Integer week) {

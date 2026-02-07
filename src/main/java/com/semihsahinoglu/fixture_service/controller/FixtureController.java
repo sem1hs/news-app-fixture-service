@@ -1,9 +1,6 @@
 package com.semihsahinoglu.fixture_service.controller;
 
-import com.semihsahinoglu.fixture_service.dto.CreateFixtureRequest;
-import com.semihsahinoglu.fixture_service.dto.FixtureResponse;
-import com.semihsahinoglu.fixture_service.dto.FixtureTodayResponse;
-import com.semihsahinoglu.fixture_service.dto.UpdateFixtureRequest;
+import com.semihsahinoglu.fixture_service.dto.*;
 import com.semihsahinoglu.fixture_service.service.FixtureService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -30,8 +27,8 @@ public class FixtureController {
     }
 
     @GetMapping(params = "leagueId")
-    public ResponseEntity<List<FixtureResponse>> getAllByLeagueId(@RequestParam Long leagueId) {
-        List<FixtureResponse> response = fixtureService.getAllByLeagueId(leagueId);
+    public ResponseEntity<List<FixtureWeekResponse>> getAllByLeagueId(@RequestParam Long leagueId) {
+        List<FixtureWeekResponse> response = fixtureService.getAllByLeagueId(leagueId);
         return ResponseEntity.ok().body(response);
     }
 
