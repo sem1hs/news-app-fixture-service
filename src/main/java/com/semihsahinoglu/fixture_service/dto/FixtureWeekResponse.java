@@ -4,6 +4,6 @@ import java.util.List;
 
 public record FixtureWeekResponse(
         Integer week,
-        List<FixtureResponse> fixtures
+        List<FixtureTodayResponse> fixtures
 ) {
 }

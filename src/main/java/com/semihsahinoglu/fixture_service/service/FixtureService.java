@@ -55,7 +55,19 @@ public class FixtureService {
         if (!leagueExist) throw new LeagueNotFoundException("Lig bulunamadı !");
 
         List<Fixture> fixtures = fixtureRepository.findByLeagueIdOrderByMatchDateAsc(leagueId).orElseThrow(() -> new FixtureNotFoundException("Fikstür bulunamadı !"));
-        Map<Integer, List<FixtureResponse>> groupedByWeek = fixtures.stream().map(fixtureMapper::toDto).collect(Collectors.groupingBy(FixtureResponse::week));
+
+        Map<Long, String> leagueNameCache = new HashMap<>();
+        Map<Long, String> teamNameCache = new HashMap<>();
+
+        Map<Integer, List<FixtureTodayResponse>> groupedByWeek = fixtures.stream()
+                .map(fixture -> {
+                    String leagueName = leagueNameCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
+                    String homeTeamName = teamNameCache.computeIfAbsent(fixture.getHomeTeamId(), id -> teamClient.findTeamById(id).name());
+                    String awayTeamName = teamNameCache.computeIfAbsent(fixture.getAwayTeamId(), id -> teamClient.findTeamById(id).name());
+
+                    return fixtureMapper.toDto(fixture, leagueName, homeTeamName, awayTeamName);
+                })
+                .collect(Collectors.groupingBy(FixtureTodayResponse::week));
 
         return groupedByWeek.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
