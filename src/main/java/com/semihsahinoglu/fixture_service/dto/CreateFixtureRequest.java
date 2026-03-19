@@ -1,5 +1,6 @@
 package com.semihsahinoglu.fixture_service.dto;
 
+import com.semihsahinoglu.fixture_service.entity.FixtureStatus;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,10 @@ public record CreateFixtureRequest(
         Long awayTeamId,
 
         String stadium,
-        String season
+        String season,
+
+        Integer homeScore,
+        Integer awayScore,
+        FixtureStatus status
 ) {
 }

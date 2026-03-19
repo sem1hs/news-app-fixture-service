@@ -50,6 +50,12 @@ public class FixtureController {
         return ResponseEntity.status(HttpStatus.CREATED).body(fixture);
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<List<FixtureResponse>> createFixtureBulk(@RequestBody List<List<CreateFixtureRequest>> requestList) {
+        List<FixtureResponse> fixtureResponses = fixtureService.createFixtureBulk(requestList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(fixtureResponses);
+    }
+
     @PatchMapping("/{id}")
     ResponseEntity<FixtureResponse> update(@PathVariable Long id, @RequestBody UpdateFixtureRequest updateFixtureRequest) {
         FixtureResponse fixtureResponse = fixtureService.update(id, updateFixtureRequest);

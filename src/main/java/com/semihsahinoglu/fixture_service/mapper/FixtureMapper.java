@@ -22,7 +22,9 @@ public class FixtureMapper {
                 .awayTeamId(request.awayTeamId())
                 .stadium(request.stadium())
                 .season(request.season())
-                .status(FixtureStatus.SCHEDULED)
+                .homeScore(request.homeScore())
+                .awayScore(request.awayScore())
+                .status(request.status() != null ? request.status() : FixtureStatus.SCHEDULED)
                 .build();
     }
 

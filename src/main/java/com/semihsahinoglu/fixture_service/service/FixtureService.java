@@ -11,6 +11,7 @@ import com.semihsahinoglu.fixture_service.exception.TeamAlreadyHaveMatchExceptio
 import com.semihsahinoglu.fixture_service.exception.TeamNotFoundException;
 import com.semihsahinoglu.fixture_service.mapper.FixtureMapper;
 import com.semihsahinoglu.fixture_service.repository.FixtureRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -155,9 +156,17 @@ public class FixtureService {
         Fixture fixture = fixtureMapper.toEntity(request);
         Fixture savedFixture = fixtureRepository.save(fixture);
 
-        fixtureInternalService.handleFixtureCreate(savedFixture);
+        //fixtureInternalService.handleFixtureCreate(savedFixture);
 
         return fixtureMapper.toDto(savedFixture);
+    }
+
+    @Transactional
+    public List<FixtureResponse> createFixtureBulk(List<List<CreateFixtureRequest>> requestList) {
+        return requestList.stream()
+                .flatMap(List::stream)
+                .map(this::create)
+                .toList();
     }
 
     public FixtureResponse update(Long fixtureId, UpdateFixtureRequest request) {
