@@ -156,7 +156,7 @@ public class FixtureService {
         Fixture fixture = fixtureMapper.toEntity(request);
         Fixture savedFixture = fixtureRepository.save(fixture);
 
-        //fixtureInternalService.handleFixtureCreate(savedFixture);
+        fixtureInternalService.handleFixtureCreate(savedFixture);
 
         return fixtureMapper.toDto(savedFixture);
     }
