@@ -12,6 +12,8 @@ import com.semihsahinoglu.fixture_service.exception.TeamNotFoundException;
 import com.semihsahinoglu.fixture_service.mapper.FixtureMapper;
 import com.semihsahinoglu.fixture_service.repository.FixtureRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class FixtureService {
 
+    private static final Logger log = LoggerFactory.getLogger(FixtureService.class);
     private final FixtureInternalService fixtureInternalService;
     private final FixtureRepository fixtureRepository;
     private final LeagueClient leagueClient;
@@ -57,16 +60,17 @@ public class FixtureService {
 
         List<Fixture> fixtures = fixtureRepository.findByLeagueIdOrderByMatchDateAsc(leagueId).orElseThrow(() -> new FixtureNotFoundException("Fikstür bulunamadı !"));
 
-        Map<Long, String> leagueNameCache = new HashMap<>();
-        Map<Long, String> teamNameCache = new HashMap<>();
+        Map<Long, String> leagueCache = new HashMap<>();
+        Map<Long, TeamResponse> teamCache = new HashMap<>();
 
         Map<Integer, List<FixtureTodayResponse>> groupedByWeek = fixtures.stream()
                 .map(fixture -> {
-                    String leagueName = leagueNameCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
-                    String homeTeamName = teamNameCache.computeIfAbsent(fixture.getHomeTeamId(), id -> teamClient.findTeamById(id).name());
-                    String awayTeamName = teamNameCache.computeIfAbsent(fixture.getAwayTeamId(), id -> teamClient.findTeamById(id).name());
+                    String leagueName = leagueCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
 
-                    return fixtureMapper.toDto(fixture, leagueName, homeTeamName, awayTeamName);
+                    TeamResponse homeTeam = teamCache.computeIfAbsent(fixture.getHomeTeamId(), teamClient::findTeamById);
+                    TeamResponse awayTeam = teamCache.computeIfAbsent(fixture.getAwayTeamId(), teamClient::findTeamById);
+
+                    return fixtureMapper.toDto(fixture, leagueName, homeTeam.name(), awayTeam.name(), homeTeam.logoUrl(), awayTeam.logoUrl());
                 })
                 .collect(Collectors.groupingBy(FixtureTodayResponse::week));
 
@@ -83,16 +87,17 @@ public class FixtureService {
 
         List<Fixture> fixtures = fixtureRepository.findByLeagueIdAndWeekOrderByMatchDateAsc(leagueId, week).orElseThrow(() -> new FixtureNotFoundException("Fikstür bulunamadı !"));
 
-        Map<Long, String> leagueNameCache = new HashMap<>();
-        Map<Long, String> teamNameCache = new HashMap<>();
+        Map<Long, String> leagueCache = new HashMap<>();
+        Map<Long, TeamResponse> teamCache = new HashMap<>();
 
         return fixtures.stream()
                 .map(fixture -> {
-                    String leagueName = leagueNameCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
-                    String homeTeamName = teamNameCache.computeIfAbsent(fixture.getHomeTeamId(), id -> teamClient.findTeamById(id).name());
-                    String awayTeamName = teamNameCache.computeIfAbsent(fixture.getAwayTeamId(), id -> teamClient.findTeamById(id).name());
+                    String leagueName = leagueCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
 
-                    return fixtureMapper.toDto(fixture, leagueName, homeTeamName, awayTeamName);
+                    TeamResponse homeTeam = teamCache.computeIfAbsent(fixture.getHomeTeamId(), teamClient::findTeamById);
+                    TeamResponse awayTeam = teamCache.computeIfAbsent(fixture.getAwayTeamId(), teamClient::findTeamById);
+
+                    return fixtureMapper.toDto(fixture, leagueName, homeTeam.name(), awayTeam.name(), homeTeam.logoUrl(), awayTeam.logoUrl());
                 })
                 .toList();
     }
@@ -107,16 +112,17 @@ public class FixtureService {
 
         if (fixtures == null) throw new FixtureNotFoundException("Bugüne ait fikstür bulunamadı !");
 
-        Map<Long, String> leagueNameCache = new HashMap<>();
-        Map<Long, String> teamNameCache = new HashMap<>();
+        Map<Long, String> leagueCache = new HashMap<>();
+        Map<Long, TeamResponse> teamCache = new HashMap<>();
 
         return fixtures.stream()
                 .map(fixture -> {
-                    String leagueName = leagueNameCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
-                    String homeTeamName = teamNameCache.computeIfAbsent(fixture.getHomeTeamId(), id -> teamClient.findTeamById(id).name());
-                    String awayTeamName = teamNameCache.computeIfAbsent(fixture.getAwayTeamId(), id -> teamClient.findTeamById(id).name());
+                    String leagueName = leagueCache.computeIfAbsent(fixture.getLeagueId(), id -> leagueClient.findLeagueById(id).name());
 
-                    return fixtureMapper.toDto(fixture, leagueName, homeTeamName, awayTeamName);
+                    TeamResponse homeTeam = teamCache.computeIfAbsent(fixture.getHomeTeamId(), teamClient::findTeamById);
+                    TeamResponse awayTeam = teamCache.computeIfAbsent(fixture.getAwayTeamId(), teamClient::findTeamById);
+
+                    return fixtureMapper.toDto(fixture, leagueName, homeTeam.name(), awayTeam.name(), homeTeam.logoUrl(), awayTeam.logoUrl());
                 })
                 .collect(Collectors.groupingBy(
                         FixtureTodayResponse::leagueName,

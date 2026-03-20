@@ -11,6 +11,8 @@ public record FixtureTodayResponse(
         LocalDateTime matchDate,
         String homeTeamName,
         String awayTeamName,
+        String homeTeamUrl,
+        String awayTeamUrl,
         Integer homeScore,
         Integer awayScore,
         String stadium,
@@ -30,6 +32,8 @@ public record FixtureTodayResponse(
         private LocalDateTime matchDate;
         private String homeTeamName;
         private String awayTeamName;
+        private String homeTeamUrl;
+        private String awayTeamUrl;
         private Integer homeScore;
         private Integer awayScore;
         private String stadium;
@@ -69,6 +73,16 @@ public record FixtureTodayResponse(
             return this;
         }
 
+        public Builder homeTeamUrl(String homeTeamUrl) {
+            this.homeTeamUrl = homeTeamUrl;
+            return this;
+        }
+
+        public Builder awayTeamUrl(String awayTeamUrl) {
+            this.awayTeamUrl = awayTeamUrl;
+            return this;
+        }
+
         public Builder homeScore(Integer homeScore) {
             this.homeScore = homeScore;
             return this;
@@ -95,7 +109,7 @@ public record FixtureTodayResponse(
         }
 
         public FixtureTodayResponse build() {
-            return new FixtureTodayResponse(id, leagueName, week, matchDate, homeTeamName, awayTeamName, homeScore, awayScore, stadium, season, status);
+            return new FixtureTodayResponse(id, leagueName, week, matchDate, homeTeamName, awayTeamName, homeTeamUrl, awayTeamUrl, homeScore, awayScore, stadium, season, status);
         }
     }
 }

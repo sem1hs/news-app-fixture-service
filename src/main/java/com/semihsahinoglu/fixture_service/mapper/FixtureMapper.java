@@ -46,7 +46,7 @@ public class FixtureMapper {
                 .build();
     }
 
-    public FixtureTodayResponse toDto(Fixture fixture, String leagueName, String homeTeamName, String awayTeamName) {
+    public FixtureTodayResponse toDto(Fixture fixture, String leagueName, String homeTeamName, String awayTeamName, String homeTeamLogo, String awayTeamLogo) {
         if (fixture == null) return null;
 
         return FixtureTodayResponse.builder()
@@ -56,6 +56,8 @@ public class FixtureMapper {
                 .matchDate(fixture.getMatchDate())
                 .homeTeamName(homeTeamName)
                 .awayTeamName(awayTeamName)
+                .homeTeamUrl(homeTeamLogo)
+                .awayTeamUrl(awayTeamLogo)
                 .homeScore(fixture.getHomeScore())
                 .awayScore(fixture.getAwayScore())
                 .stadium(fixture.getStadium())
