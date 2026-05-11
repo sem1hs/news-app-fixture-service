@@ -1,12 +1,12 @@
 package com.semihsahinoglu.fixture_service.mapper;
 
-import com.semihsahinoglu.fixture_service.dto.CreateFixtureRequest;
-import com.semihsahinoglu.fixture_service.dto.FixtureResponse;
-import com.semihsahinoglu.fixture_service.dto.FixtureTodayResponse;
-import com.semihsahinoglu.fixture_service.dto.UpdateFixtureRequest;
+import com.semihsahinoglu.fixture_service.dto.*;
+import com.semihsahinoglu.fixture_service.dto.api.ApiFootballFixtureWrapper;
 import com.semihsahinoglu.fixture_service.entity.Fixture;
 import com.semihsahinoglu.fixture_service.entity.FixtureStatus;
 import org.springframework.stereotype.Component;
+
+import java.time.OffsetDateTime;
 
 @Component
 public class FixtureMapper {
@@ -25,6 +25,25 @@ public class FixtureMapper {
                 .homeScore(request.homeScore())
                 .awayScore(request.awayScore())
                 .status(request.status() != null ? request.status() : FixtureStatus.SCHEDULED)
+                .build();
+    }
+
+    public Fixture toEntity(Long externalFixtureId, LeagueResponse league, ApiFootballFixtureWrapper wrapper, TeamResponse homeTeam, TeamResponse awayTeam) {
+
+        Integer week = extractWeek(wrapper.league().round());
+
+        return Fixture.builder()
+                .externalId(externalFixtureId)
+                .leagueId(league.id())
+                .week(week)
+                .matchDate(OffsetDateTime.parse(wrapper.fixture().date()).toLocalDateTime())
+                .homeTeamId(homeTeam.id())
+                .awayTeamId(awayTeam.id())
+                .homeScore(wrapper.goals().home())
+                .awayScore(wrapper.goals().away())
+                .stadium(wrapper.fixture().venue().name())
+                .season(String.valueOf(wrapper.league().season()))
+                .status(mapStatus(wrapper.fixture().status().shortCode()))
                 .build();
     }
 
@@ -87,4 +106,19 @@ public class FixtureMapper {
         });
     }
 
+    private Integer extractWeek(String round) {
+        return Integer.parseInt(round.replaceAll("\\D+", ""));
+    }
+
+    private FixtureStatus mapStatus(String status) {
+        return switch (status) {
+            case "FT" -> FixtureStatus.FINISHED;
+
+            case "NS" -> FixtureStatus.SCHEDULED;
+
+            case "1H", "2H", "HT" -> FixtureStatus.LIVE;
+
+            default -> FixtureStatus.SCHEDULED;
+        };
+    }
 }

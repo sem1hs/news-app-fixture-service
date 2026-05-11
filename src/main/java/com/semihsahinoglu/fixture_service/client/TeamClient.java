@@ -2,6 +2,7 @@ package com.semihsahinoglu.fixture_service.client;
 
 import com.semihsahinoglu.fixture_service.config.GlobalFeignConfig;
 import com.semihsahinoglu.fixture_service.config.InternalFeignConfig;
+import com.semihsahinoglu.fixture_service.dto.LeagueResponse;
 import com.semihsahinoglu.fixture_service.dto.TeamResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,5 +16,8 @@ public interface TeamClient {
 
     @GetMapping("/internal/teams/{id}")
     TeamResponse findTeamById(@PathVariable("id") Long id);
+
+    @GetMapping("/internal/teams/external/{id}")
+    TeamResponse findTeamExternalById(@PathVariable("id") Long id);
 
 }

@@ -45,10 +45,14 @@ public class Fixture extends Auditable {
     @Column(length = 20)
     private FixtureStatus status;
 
+    @NotNull
+    @Column(name = "external_id", nullable = false, unique = true)
+    private Long externalId;
+
     protected Fixture() {
     }
 
-    public Fixture(Long leagueId, Integer week, LocalDateTime matchDate, Long homeTeamId, Long awayTeamId, Integer homeScore, Integer awayScore, String stadium, String season, FixtureStatus status) {
+    public Fixture(Long leagueId, Integer week, LocalDateTime matchDate, Long homeTeamId, Long awayTeamId, Integer homeScore, Integer awayScore, String stadium, String season, FixtureStatus status, Long externalId) {
         this.leagueId = leagueId;
         this.week = week;
         this.matchDate = matchDate;
@@ -59,6 +63,7 @@ public class Fixture extends Auditable {
         this.stadium = stadium;
         this.season = season;
         this.status = status;
+        this.externalId = externalId;
     }
 
     public static Builder builder() {
@@ -76,6 +81,7 @@ public class Fixture extends Auditable {
         private String stadium;
         private String season;
         private FixtureStatus status;
+        private Long externalId;
 
         private Builder() {
         }
@@ -130,8 +136,13 @@ public class Fixture extends Auditable {
             return this;
         }
 
+        public Builder externalId(Long externalId) {
+            this.externalId = externalId;
+            return this;
+        }
+
         public Fixture build() {
-            return new Fixture(leagueId, week, matchDate, homeTeamId, awayTeamId, homeScore, awayScore, stadium, season, status);
+            return new Fixture(leagueId, week, matchDate, homeTeamId, awayTeamId, homeScore, awayScore, stadium, season, status, externalId);
         }
     }
 
@@ -213,5 +224,13 @@ public class Fixture extends Auditable {
 
     public void setStatus(FixtureStatus status) {
         this.status = status;
+    }
+
+    public Long getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
     }
 }

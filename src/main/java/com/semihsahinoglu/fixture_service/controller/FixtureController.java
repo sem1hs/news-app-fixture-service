@@ -38,6 +38,12 @@ public class FixtureController {
         return ResponseEntity.ok().body(response);
     }
 
+    @GetMapping("/sync/{leagueExternalId}")
+    public ResponseEntity<List<FixtureResponse>> syncFixtures(@PathVariable Long leagueExternalId, @RequestParam(defaultValue = "2025") int season, @RequestParam int start, @RequestParam int end) {
+        List<FixtureResponse> fixtures = fixtureService.getByExternalId(leagueExternalId, season, start, end);
+        return ResponseEntity.ok(fixtures);
+    }
+
     @GetMapping("/today")
     public ResponseEntity<Map<String, List<FixtureTodayResponse>>> getTodayFixtures() {
         Map<String, List<FixtureTodayResponse>> response = fixtureService.getTodayFixtures();

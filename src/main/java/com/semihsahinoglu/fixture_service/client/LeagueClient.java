@@ -15,4 +15,7 @@ public interface LeagueClient {
 
     @GetMapping("/internal/league/{id}")
     LeagueResponse findLeagueById(@PathVariable("id") Long id);
+
+    @GetMapping("/internal/league/external/{id}")
+    LeagueResponse findLeagueExternalById(@PathVariable("id") Long id);
 }

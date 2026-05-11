@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
@@ -37,20 +34,33 @@ public class FixtureService {
     private final TeamClient teamClient;
     private final Executor apiExecutor;
     private final FixtureMapper fixtureMapper;
+    private final FixtureSyncService fixtureSyncService;
 
-
-    public FixtureService(FixtureInternalService fixtureInternalService, FixtureRepository fixtureRepository, LeagueClient leagueClient, TeamClient teamClient, @Qualifier("apiExecutor") Executor apiExecutor, FixtureMapper fixtureMapper) {
+    public FixtureService(FixtureInternalService fixtureInternalService, FixtureRepository fixtureRepository, LeagueClient leagueClient, TeamClient teamClient, @Qualifier("apiExecutor") Executor apiExecutor, FixtureMapper fixtureMapper, FixtureSyncService fixtureSyncService) {
         this.fixtureInternalService = fixtureInternalService;
         this.fixtureRepository = fixtureRepository;
         this.leagueClient = leagueClient;
         this.teamClient = teamClient;
         this.apiExecutor = apiExecutor;
         this.fixtureMapper = fixtureMapper;
+        this.fixtureSyncService = fixtureSyncService;
     }
 
     public FixtureResponse getById(Long fixtureId) {
         Fixture fixture = fixtureRepository.findById(fixtureId).orElseThrow(() -> new FixtureNotFoundException("Fikstür bulunamadı " + fixtureId));
         return fixtureMapper.toDto(fixture);
+    }
+
+    public List<FixtureResponse> getByExternalId(Long leagueExternalId, int season, int start, int end) {
+        List<List<Fixture>> fixtures = new ArrayList<>();
+
+        for (int i = start; i <= end; i++) {
+            String round = "Regular Season - " + i;
+            List<Fixture> syncedFixtures = fixtureSyncService.syncFixtures(leagueExternalId, season, round);
+            fixtures.add(syncedFixtures);
+            syncedFixtures.forEach(fixtureInternalService::handleFixtureCreate);
+        }
+        return fixtures.stream().flatMap(List::stream).map(fixtureMapper::toDto).toList();
     }
 
     public List<FixtureWeekResponse> getAllByLeagueId(Long leagueId) {

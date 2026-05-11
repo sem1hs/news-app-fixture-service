@@ -23,4 +23,6 @@ public interface FixtureRepository extends JpaRepository<Fixture, Long> {
     @Query("SELECT f FROM Fixture f WHERE f.matchDate >= :startOfDay AND f.matchDate < :endOfDay ORDER BY f.matchDate ASC")
     List<Fixture> findTodayFixtures(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 
+    Optional<Fixture> findByExternalId(Long externalId);
+
 }
