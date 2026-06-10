@@ -51,12 +51,12 @@ public class FixtureService {
         return fixtureMapper.toDto(fixture);
     }
 
-    public List<FixtureResponse> getByExternalId(Long leagueExternalId, int season, int start, int end) {
+    public List<FixtureResponse> getByExternalId(Long leagueExternalId, int season, int start, int end, String round) {
         List<List<Fixture>> fixtures = new ArrayList<>();
 
         for (int i = start; i <= end; i++) {
-            String round = "Regular Season - " + i;
-            List<Fixture> syncedFixtures = fixtureSyncService.syncFixtures(leagueExternalId, season, round);
+            String newRound = round + i;
+            List<Fixture> syncedFixtures = fixtureSyncService.syncFixtures(leagueExternalId, season, newRound);
             fixtures.add(syncedFixtures);
             syncedFixtures.forEach(fixtureInternalService::handleFixtureCreate);
         }

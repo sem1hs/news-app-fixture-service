@@ -39,8 +39,8 @@ public class FixtureController {
     }
 
     @GetMapping("/sync/{leagueExternalId}")
-    public ResponseEntity<List<FixtureResponse>> syncFixtures(@PathVariable Long leagueExternalId, @RequestParam(defaultValue = "2025") int season, @RequestParam int start, @RequestParam int end) {
-        List<FixtureResponse> fixtures = fixtureService.getByExternalId(leagueExternalId, season, start, end);
+    public ResponseEntity<List<FixtureResponse>> syncFixtures(@PathVariable Long leagueExternalId, @RequestParam(defaultValue = "2025") int season, @RequestParam int start, @RequestParam int end, @RequestParam(defaultValue = "Regular Season - ") String round) {
+        List<FixtureResponse> fixtures = fixtureService.getByExternalId(leagueExternalId, season, start, end, round);
         return ResponseEntity.ok(fixtures);
     }
 
