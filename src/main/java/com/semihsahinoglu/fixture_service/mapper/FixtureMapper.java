@@ -36,7 +36,7 @@ public class FixtureMapper {
                 .externalId(externalFixtureId)
                 .leagueId(league.id())
                 .week(week)
-                .matchDate(OffsetDateTime.parse(wrapper.fixture().date()).toLocalDateTime())
+                .matchDate(OffsetDateTime.parse(wrapper.fixture().date()).plusHours(3).toLocalDateTime())
                 .homeTeamId(homeTeam.id())
                 .awayTeamId(awayTeam.id())
                 .homeScore(wrapper.goals().home())
